@@ -23,9 +23,12 @@ exports.handler = async function () {
     };
   }
 
-  const today = new Date();
-  const endDate = today.toISOString().slice(0, 10);
-  const startDate = "2026-04-01";
+ const startDate = "2025-12-29";
+
+const today = new Date();
+today.setDate(today.getDate() - 1); // mundur 1 hari
+
+const endDate = today.toISOString().slice(0, 10);
 
   const params = new URLSearchParams({
     ids: "channel==MINE",
