@@ -659,7 +659,36 @@ function perfTag(v){
 }
 renderInsights();
 renderPlans();
+async function syncYoutubeStats() {
+  const ids = VIDEOS.map(v => v.id).join(",");
 
+  try {
+    const res = await fetch("/.netlify/functions/youtube?ids=" + ids);
+    const data = await res.json();
+
+    if (!data.items) return;
+
+    data.items.forEach(item => {
+      const video = VIDEOS.find(v => v.id === item.id);
+      if (!video) return;
+
+      video.views = Number(item.statistics.viewCount || 0);
+      video.likes = Number(item.statistics.likeCount || 0);
+      video.comments = Number(item.statistics.commentCount || 0);
+
+      if (item.snippet?.title) {
+        video.apiTitle = item.snippet.title;
+      }
+    });
+
+    applyFilters();
+  } catch (error) {
+    console.error("Gagal mengambil data YouTube:", error);
+  }
+}
+
+syncYoutubeStats();
+setInterval(syncYoutubeStats, 300000);
 applyFilters();
 </script>
 </body>
