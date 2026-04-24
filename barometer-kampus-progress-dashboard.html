@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barometer Kampus — Content Progress Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;
+  --blue:#1a4ed8;
+  --blue-mid:#2563eb;
+  --blue-light:#3b82f6;
+  --gold:#f59e0b;
+  --gold-light:#fbbf24;
+  --bg:#f0f4ff;
+  --card:#ffffff;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --green:#10b981;
+  --red:#ef4444;
+  --purple:#8b5cf6;
+  --teal:#14b8a6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+.header{background:var(--navy);padding:0;position:relative;overflow:hidden}
+.header-inner{max-width:1200px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:2}
+.header::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(37,99,235,0.35) 0%,transparent 70%)}
+.header::after{content:'';position:absolute;bottom:-60px;left:200px;width:300px;height:300px;background:radial-gradient(circle,rgba(245,158,11,0.15) 0%,transparent 70%)}
+.header-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-dot{width:10px;height:10px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+.brand{font-family:'Sora',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase}
+.live-badge{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#34d399;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.header h1{font-family:'Sora',sans-serif;font-size:clamp(20px,4vw,34px);font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2}
+.header h1 span{color:var(--gold)}
+.header p{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:1.5rem}
+.stat-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:6px 16px;display:flex;align-items:center;gap:8px}
+.pill-val{font-size:14px;font-weight:700;color:#fff}
+.pill-label{font-size:11px;color:rgba(255,255,255,0.45)}
+
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:2rem}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:2rem}
+.stat-card{background:var(--card);border-radius:16px;padding:1.25rem;border:1px solid var(--border);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.c1::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.stat-card.c2::before{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
+.stat-card.c3::before{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.stat-card.c4::before{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.stat-card.c5::before{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
+.stat-card.c6::before{background:linear-gradient(90deg,#f43f5e,#fb7185)}
+.stat-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.stat-val{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.stat-icon{position:absolute;right:1rem;top:1.25rem;font-size:20px;opacity:.12}
+
+/* WORKFLOW TIMELINE */
+.workflow{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:1.5rem;margin-bottom:2rem}
+.workflow-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px}
+.workflow-title::before{content:'';display:block;width:3px;height:16px;background:linear-gradient(180deg,var(--blue),var(--gold));border-radius:2px}
+.wf-track{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px}
+.wf-step{flex:1;min-width:90px;text-align:center;position:relative}
+.wf-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:15px;border:2px solid transparent;transition:all .2s}
+.wf-dot.done{background:var(--blue);border-color:#1a4ed8;box-shadow:0 0 0 4px rgba(37,99,235,.15)}
+.wf-dot.terbit{background:var(--green);border-color:#059669;box-shadow:0 0 0 4px rgba(16,185,129,.15)}
+.wf-dot.inactive{background:#f1f5f9;border-color:#e2e8f0;color:#94a3b8}
+.wf-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.wf-label.done{color:var(--blue)}
+.wf-label.terbit{color:var(--green)}
+.wf-label.inactive{color:#94a3b8}
+.wf-count{font-size:10px;color:var(--muted);margin-top:2px}
+.wf-connector{flex:1;height:2px;margin-bottom:26px;min-width:16px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.wf-connector.inactive{background:#e2e8f0}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+.filter-group{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.filter-btn{padding:7px 14px;font-size:12px;font-weight:600;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.filter-btn.active{background:var(--blue);color:#fff}
+.filter-btn:hover:not(.active){background:var(--bg);color:var(--navy)}
+.search-wrap{flex:1;min-width:180px;position:relative}
+.search-input{width:100%;padding:8px 14px 8px 36px;border:1px solid var(--border);border-radius:10px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--card);color:var(--text);outline:none;transition:border .2s}
+.search-input:focus{border-color:var(--blue-light)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+.sort-select{padding:8px 12px;border:1px solid var(--border);border-radius:10px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--card);color:var(--text);outline:none;cursor:pointer}
+
+/* VIEW TOGGLE */
+.view-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.view-btn{padding:7px 12px;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--muted);transition:all .15s}
+.view-btn.active{background:var(--navy);color:#fff}
+
+/* TABLE */
+.table-wrap{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
+.table-header-row{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.table-title{font-size:13px;font-weight:700;color:var(--navy)}
+.count-badge{background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:#f8fafc;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+thead th:hover{color:var(--blue)}
+tbody tr{border-bottom:1px solid #f1f5f9;transition:background .12s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8faff}
+td{padding:10px 12px;vertical-align:middle}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;letter-spacing:.2px}
+.b-terbit{background:#d1fae5;color:#065f46}
+.b-shorts{background:#fef3c7;color:#92400e}
+.b-podcast{background:#ede9fe;color:#5b21b6}
+.b-youtube{background:#dbeafe;color:#1e40af}
+
+/* STATUS BADGE — produksi */
+.s-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.s-terbit{background:#d1fae5;color:#065f46}
+.s-siap{background:#dbeafe;color:#1e40af}
+.s-editing{background:#fef3c7;color:#92400e}
+.s-review{background:#ede9fe;color:#5b21b6}
+.s-rekaman{background:#ffedd5;color:#9a3412}
+.s-ide{background:#f1f5f9;color:#475569}
+.s-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.sd-terbit{background:#10b981}
+.sd-siap{background:#3b82f6}
+.sd-editing{background:#f59e0b}
+.sd-review{background:#8b5cf6}
+.sd-rekaman{background:#f97316}
+.sd-ide{background:#94a3b8}
+
+/* PROGRESS BAR */
+.prog-col{min-width:110px}
+.prog-label{display:flex;justify-content:space-between;margin-bottom:4px}
+.prog-pct{font-size:10px;font-weight:700;color:var(--navy)}
+.prog-stage{font-size:9px;color:var(--muted)}
+.prog-track{background:#f1f5f9;border-radius:8px;height:6px;overflow:hidden}
+.prog-fill{height:6px;border-radius:8px;transition:width 1s ease}
+.pf-terbit{background:linear-gradient(90deg,#10b981,#34d399)}
+.pf-siap{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
+.pf-editing{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.pf-review{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.pf-rekaman{background:linear-gradient(90deg,#f97316,#fb923c)}
+.pf-ide{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
+
+/* VIEWS BAR */
+.views-bar-wrap{background:#f1f5f9;border-radius:8px;height:5px;min-width:60px;overflow:hidden;margin-top:4px}
+.views-bar-fill{height:5px;border-radius:8px;background:linear-gradient(90deg,var(--blue-mid),var(--blue-light))}
+
+/* CARD VIEW */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:1.5rem}
+.content-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:1.1rem;transition:transform .2s,box-shadow .2s;cursor:pointer;position:relative;overflow:hidden}
+.content-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,0.09)}
+.content-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.card-terbit::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.card-siap::before{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
+.card-editing::before{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.card-review::before{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.card-rekaman::before{background:linear-gradient(90deg,#f97316,#fb923c)}
+.card-ide::before{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-title{font-size:12px;font-weight:700;color:var(--navy);line-height:1.45;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-type{flex-shrink:0}
+.card-meta{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.card-date{font-size:10px;color:var(--muted)}
+.card-prog-label{display:flex;justify-content:space-between;margin-bottom:5px}
+.card-prog-pct{font-size:11px;font-weight:700;color:var(--navy)}
+.card-prog-status{font-size:10px;color:var(--muted)}
+.card-prog-track{background:#f1f5f9;border-radius:10px;height:8px;overflow:hidden;margin-bottom:10px}
+.card-prog-fill{height:8px;border-radius:10px}
+.card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9}
+.card-stat{text-align:center}
+.card-stat-val{font-size:12px;font-weight:700;color:var(--navy)}
+.card-stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);flex-wrap:wrap;gap:8px}
+.page-btns{display:flex;gap:4px;flex-wrap:wrap}
+.page-btn{padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.page-btn.active,.page-btn:hover:not(:disabled){background:var(--blue);color:#fff;border-color:var(--blue)}
+.page-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* FOOTER */
+.footer{text-align:center;padding:1.5rem;font-size:11px;color:var(--muted);border-top:1px solid var(--border);background:var(--card)}
+
+
+
+/* V2 FUTURISTIC LAYER */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(26,78,216,.06),transparent 38%,rgba(245,158,11,.06));z-index:-1}
+.header{background:linear-gradient(135deg,#07111f 0%,#0a1628 48%,#101b3a 100%)}
+.header::before{animation:floatOrb 9s ease-in-out infinite}
+.header::after{animation:floatOrb 12s ease-in-out infinite reverse}
+@keyframes floatOrb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-24px,18px) scale(1.08)}}
+.live-badge{box-shadow:0 0 24px rgba(16,185,129,.22)}
+.prog-fill,.card-prog-fill,.views-bar-fill{position:relative;overflow:hidden}
+.prog-fill::after,.card-prog-fill::after,.views-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);transform:translateX(-100%);animation:barSweep 2.8s infinite}
+@keyframes barSweep{100%{transform:translateX(100%)}}
+.section-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-bottom:2rem}
+.panel{background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:18px;padding:1.25rem;box-shadow:0 10px 30px rgba(15,23,42,.05)}
+.panel-title{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel-title span:first-child{display:flex;align-items:center;gap:8px}.panel-title span:first-child::before{content:'';display:block;width:3px;height:16px;background:linear-gradient(180deg,var(--blue),var(--gold));border-radius:2px}
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.insight-card{padding:1rem;border-radius:15px;background:linear-gradient(180deg,#fff,#f8faff);border:1px solid #e8eefc;min-height:104px}
+.insight-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:800;margin-bottom:6px}.insight-main{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--navy)}.insight-note{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.45}.trend-up{color:#059669}.trend-warn{color:#d97706}.trend-low{color:#dc2626}
+.plan-list{display:grid;gap:10px}.plan-card{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;border:1px solid #bfdbfe;background:linear-gradient(135deg,#ffffff,#eff6ff 58%,#fff7ed);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}.plan-card::before{content:"Akan Tayang";position:absolute;right:-34px;top:12px;transform:rotate(35deg);background:linear-gradient(90deg,var(--blue),var(--gold));color:#fff;font-size:9px;font-weight:900;letter-spacing:.5px;padding:4px 34px;text-transform:uppercase}.plan-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.07)}.plan-date{width:58px;text-align:center;border-radius:12px;padding:8px 6px;background:linear-gradient(135deg,#dbeafe,#fff7ed);font-weight:900;color:var(--navy);box-shadow:inset 0 0 0 1px rgba(37,99,235,.12)}.plan-date small{display:block;font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase}.plan-title{font-size:12px;font-weight:800;color:var(--navy);line-height:1.35;padding-right:58px}.plan-meta{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.55}.plan-status{font-size:10px;font-weight:800;border-radius:999px;padding:4px 9px;white-space:nowrap}.countdown-box{margin-top:7px;display:inline-flex;align-items:center;gap:6px;background:rgba(26,78,216,.08);border:1px solid rgba(26,78,216,.16);color:var(--blue);font-size:10px;font-weight:800;border-radius:999px;padding:5px 9px}.countdown-box strong{font-family:"Sora",sans-serif}.schedule-empty{padding:14px;border:1px dashed var(--border);border-radius:14px;font-size:11px;color:var(--muted);background:#fff}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem}.mini-action{border:1px solid var(--border);background:#fff;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800;color:var(--navy)}
+.perf-tag{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:800}.tag-hot{background:#fee2e2;color:#991b1b}.tag-good{background:#dcfce7;color:#166534}.tag-watch{background:#fef3c7;color:#92400e}
+@media(max-width:820px){.section-grid{grid-template-columns:1fr}.insight-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.insight-grid{grid-template-columns:1fr}.plan-card{grid-template-columns:1fr}.plan-status{justify-self:start}}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .main{padding:1rem}
+  .header-inner{padding:1.5rem 1rem}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  thead th:nth-child(n+7),td:nth-child(n+7){display:none}
+}
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:1fr}
+  .cards-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-wrap">
+        <div class="logo-dot"></div>
+        <span class="brand">Barometer Kampus · IAIN Pontianak</span>
+      </div>
+      <span class="live-badge">● YouTube Studio</span>
+    </div>
+    <h1>Content <span>Progress</span> Dashboard</h1>
+    <p>Monitoring status & performa produksi konten — per April 2026</p>
+    <div class="stat-pills" id="headerPills"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="workflow">
+    <div class="workflow-title">Alur Produksi Konten</div>
+    <div class="wf-track" id="wfTrack"></div>
+  </div>
+
+  <div class="section-grid">
+    <section class="panel">
+      <div class="panel-title"><span>Insight Performa Konten</span><span class="count-badge">V2.0</span></div>
+      <div class="insight-grid" id="insightGrid"></div>
+      <div class="action-bar">
+        <span class="mini-action">🔥 Deteksi konten unggulan</span>
+        <span class="mini-action">⚠️ Pantau CTR rendah</span>
+        <span class="mini-action">📅 Siap untuk kalender produksi</span>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-title"><span>Jadwal Narasumber & Produksi</span><span class="count-badge" id="planCount">- agenda</span></div>
+      <div class="plan-list" id="planList"></div>
+    </section>
+  </div>
+
+
+  <div class="toolbar">
+    <div class="filter-group">
+      <button class="filter-btn active" onclick="setFilter('semua',this)">Semua</button>
+      <button class="filter-btn" onclick="setFilter('Terbit',this)">Terbit</button>
+      <button class="filter-btn" onclick="setFilter('Shorts',this)">Shorts</button>
+      <button class="filter-btn" onclick="setFilter('Podcast',this)">Podcast/Panjang</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Cari judul video..." oninput="doSearch(this.value)">
+    </div>
+    <select class="sort-select" onchange="doSort(this.value)">
+      <option value="views">Urutkan: Views</option>
+      <option value="watchtime">Watch Time</option>
+      <option value="ctr">CTR %</option>
+      <option value="avgview">Avg View %</option>
+      <option value="date">Tanggal</option>
+    </select>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnTable" onclick="setView('table')" title="Tampilan Tabel">☰</button>
+      <button class="view-btn" id="btnCard" onclick="setView('card')" title="Tampilan Kartu">⊞</button>
+    </div>
+  </div>
+
+  <div id="tableView">
+    <div class="table-wrap">
+      <div class="table-header-row">
+        <span class="table-title">Daftar Konten &amp; Progress Produksi</span>
+        <span class="count-badge" id="countBadge">– video</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th>Judul Video</th>
+              <th>Tipe</th>
+              <th>Status Produksi</th>
+              <th>Progress</th>
+              <th>Tgl Publish</th>
+              <th>Views</th>
+              <th>Watch Time</th>
+              <th>Avg View %</th>
+              <th>CTR %</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <div id="cardView" style="display:none">
+    <div class="cards-grid" id="cardGrid"></div>
+    <div class="table-wrap" style="border-top:none;border-radius:0 0 16px 16px">
+      <div class="pagination" id="paginationCard"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Barometer Kampus · IAIN Pontianak &nbsp;|&nbsp; Dashboard V2.0: performa YouTube, pipeline produksi, dan jadwal narasumber &nbsp;|&nbsp; April 2026
+</div>
+
+<script>
+const VIDEOS = [
+  {id:"1d5BFaLIQ2U",title:"Sosialisasi Pengisian Dokumen Daftar Ulang Jalur SPAN PTKIN di IAIN Pontianak",date:"Apr 15, 2026",dur:4076,avgPct:9.77,views:823,watch:91.06,subs:54,imp:4633,ctr:2.68},
+  {id:"a9bxpcrDeY8",title:"Makna Sesungguhnya Puasa: Bukan Sekadar Menahan Lapar dan Dahaga",date:"Feb 19, 2026",dur:2864,avgPct:26.52,views:346,watch:72.99,subs:1,imp:2825,ctr:2.9},
+  {id:"i41Cm-PGeeY",title:"Puasa dan Lebaran Bisa Berbeda? Ini Kata Ilmu Falak",date:"Mar 13, 2026",dur:2750,avgPct:18.9,views:473,watch:68.3,subs:2,imp:2113,ctr:6.81},
+  {id:"9qZFaYaNFS8",title:"Hak Mahasiswa Disabilitas: Bukan Sekadar Kasihan, Tapi Kewajiban Kampus!",date:"Feb 17, 2026",dur:2008,avgPct:37.65,views:315,watch:66.15,subs:1,imp:2629,ctr:2.02},
+  {id:"wSKfN8V5Hj4",title:'Dosen vs Gen Z: Mengapa Kampus Sekarang Harus Lebih "Ramah"?',date:"Feb 14, 2026",dur:1668,avgPct:26.35,views:281,watch:34.31,subs:2,imp:3135,ctr:2.42},
+  {id:"vIsTbVfan1U",title:"Kerja di Kantor, Tapi Bisa Go Internasional? Rahasia Zuraidah Raih Wattys Award!",date:"Apr 11, 2026",dur:2760,avgPct:11.64,views:293,watch:26.14,subs:4,imp:2803,ctr:2.03},
+  {id:"jV34Tv_QUTg",title:"IAIN Pontianak Menuju UIN: Sudah 99%, Apa yang Masih Jadi Kendala?",date:"Jan 8, 2026",dur:1659,avgPct:11.29,views:486,watch:25.29,subs:6,imp:2870,ctr:7.07},
+  {id:"o2WVmBPuHE0",title:"Puasa Itu Komunikasi dengan Tuhan?",date:"Mar 1, 2026",dur:2736,avgPct:24.78,views:129,watch:24.3,subs:0,imp:1965,ctr:1.68},
+  {id:"xLxSU8EjPLY",title:"Kenapa Puasa Harus Berdampak pada Lingkungan Sosial?",date:"Mar 11, 2026",dur:1980,avgPct:23.99,views:135,watch:17.82,subs:2,imp:1187,ctr:2.61},
+  {id:"S_3tLN9zbjk",title:"Puasa Bikin Sengsara? Ini Faktanya!",date:"Mar 5, 2026",dur:2692,avgPct:16.26,views:139,watch:16.9,subs:4,imp:556,ctr:4.32},
+  {id:"8tijBuHk70k",title:"Ganteng Doang Gak Cukup! Rahasia Bujang Dare Pontianak Sukses Cari Cuan Sejak Mahasiswa",date:"Feb 10, 2026",dur:2725,avgPct:12.7,views:174,watch:16.73,subs:0,imp:2119,ctr:2.74},
+  {id:"gFoPI_mkfjM",title:"Double Degree + CPNS Sebelum Lulus?? Rahasia Uti Taklukkan Masa Muda!",date:"Feb 20, 2026",dur:1649,avgPct:14.86,views:220,watch:14.97,subs:3,imp:2658,ctr:3.8},
+  {id:"pqG4Kj5X0Hs",title:"Puasa Bisa Cegah Intoleransi? Ini Jawabannya!",date:"Mar 3, 2026",dur:1459,avgPct:20.56,views:178,watch:14.84,subs:5,imp:1095,ctr:3.84},
+  {id:"e2VjW4e6yKY",title:"Anak Penjual Buah Jadi Duta: Bukti Prestasi Tak Pandang Kasta!",date:"Jan 19, 2026",dur:2241,avgPct:15.47,views:134,watch:12.9,subs:5,imp:505,ctr:9.11},
+  {id:"Y5bLgjTqF4I",title:"Perjalanan Hafalan Alquran Nufus dan Prestasi #shorts",date:"Jan 26, 2026",dur:170,avgPct:40.34,views:1014,watch:11.7,subs:3,imp:169,ctr:2.37},
+  {id:"mEyjBJpjUTE",title:"Masa Depan IAIN Pontianak di Tangan Kita: Harapan dan Visi",date:"Jan 29, 2026",dur:1543,avgPct:18.9,views:144,watch:11.67,subs:3,imp:1147,ctr:2.35},
+  {id:"Ztj1RWMCb9A",title:"Puasa Tapi Tidak Berubah? Ini Penyebabnya!",date:"Feb 25, 2026",dur:2141,avgPct:17.89,views:108,watch:11.49,subs:0,imp:1601,ctr:1.56},
+  {id:"FjnAAUbl4xY",title:"Bukan Hanya di Drachin! Sosok CEO Muda Asal Pontianak Ini Sukses Tembus Pasar Jerman",date:"Apr 14, 2026",dur:1623,avgPct:11.22,views:221,watch:11.18,subs:3,imp:1441,ctr:2.64},
+  {id:"VWSN4-sEGa0",title:"3 Tingkatan Puasa Menurut Imam Al-Ghazali | Kamu di Level Mana?",date:"Mar 7, 2026",dur:1470,avgPct:22.2,views:115,watch:10.43,subs:0,imp:659,ctr:5.46},
+  {id:"U6V1yix3WJ0",title:"Kenapa Ramadan Sekarang Terasa Berbeda? Ini Penjelasannya",date:"Mar 9, 2026",dur:1992,avgPct:23.08,views:81,watch:10.34,subs:0,imp:440,ctr:6.82},
+  {id:"7OQgmLYSjSk",title:"Jadikan Ini Ramadan Terakhir: Rahasia Mencapai Kualitas Takwa",date:"Feb 23, 2026",dur:1410,avgPct:15.91,views:163,watch:10.16,subs:1,imp:2000,ctr:4.6},
+  {id:"12U9IY_VvRY",title:"Bukan Sekadar Masak! Peran Besar Perempuan di Ramadan",date:"Feb 27, 2026",dur:2652,avgPct:13.37,views:94,watch:9.26,subs:0,imp:1853,ctr:1.67},
+  {id:"b7m6TbH525s",title:"Dihina Tetangga & Keluarga? Ini Cara Erna Buktikan Mereka Salah! #shorts",date:"Jan 22, 2026",dur:96,avgPct:53.17,views:978,watch:8.87,subs:2,imp:216,ctr:3.24},
+  {id:"KXeYL-KkMrM",title:"Gen Z Maunya Instan? Ini Cara Raih Prestasi Internasional & Lulus 3,5 Tahun",date:"Feb 21, 2026",dur:2199,avgPct:13.49,views:107,watch:8.82,subs:3,imp:937,ctr:4.48},
+  {id:"95dzwvwXIII",title:"Kuliah Gratis Sampai Lulus? Simak Rahasia Kuliah di IAIN Pontianak 2026",date:"Jan 31, 2026",dur:3555,avgPct:7.11,views:121,watch:8.5,subs:0,imp:1036,ctr:2.9},
+  {id:"qiOM1xlwvpE",title:"Dosen & Mahasiswa Terjerat Masalah Hukum? PKBH IAIN Pontianak Siap Pasang Badan!",date:"Apr 21, 2026",dur:3056,avgPct:8.11,views:112,watch:7.71,subs:5,imp:163,ctr:9.2},
+  {id:"OJYhIBqmt8c",title:"IAIN PONTIANAK GOES TO WORLD CLASS: Mahasiswa Kita Presentasi di Depan Kampus Ranking Dunia",date:"Feb 7, 2026",dur:2281,avgPct:12.61,views:96,watch:7.67,subs:1,imp:582,ctr:5.33},
+  {id:"Q98DBMic2Tg",title:"Menjawab Opini dengan Fakta: Biaya Kuliah dan Beasiswa di IAIN Pontianak",date:"Jan 19, 2026",dur:1849,avgPct:11.59,views:111,watch:6.61,subs:3,imp:592,ctr:8.28},
+  {id:"KgfACyRf1bM",title:"Ramai Dibicarakan, Begini Sistem UKT dan Beasiswa IAIN Pontianak",date:"Feb 5, 2026",dur:2754,avgPct:8.02,views:107,watch:6.56,subs:1,imp:649,ctr:5.86},
+  {id:"CuQ4DsrMMhk",title:"Solusi Penurunan UKT Saat Kondisi Ekonomi Ber #shorts",date:"Feb 7, 2026",dur:113,avgPct:37.4,views:816,watch:6.54,subs:0,imp:187,ctr:4.28},
+  {id:"XF44yGEJWPE",title:"Gak Perlu Pusing UKT, Ada Beasiswa di Sini! #shorts",date:"Feb 6, 2026",dur:93,avgPct:41.07,views:1171,watch:5.07,subs:0,imp:181,ctr:3.31},
+  {id:"zIb5UUxvGsw",title:"Biaya Kuliah dan Beasiswa: Prof Syarif Jelaskan Kenapa Biaya Relatif #shorts",date:"Jan 18, 2026",dur:85,avgPct:37.64,views:1004,watch:4.93,subs:0,imp:192,ctr:4.69},
+  {id:"eF8kZ69QAaU",title:"Penjual Ikan bisa jadi rektor? ini cerita Prof Syarif #shorts",date:"Jan 18, 2026",dur:72,avgPct:44.92,views:937,watch:4.81,subs:0,imp:133,ctr:3.76},
+  {id:"BbMlK-zxfds",title:"Soal Cinta: Pandangan Jujur Erna soal Kesetaraan #shorts",date:"Jan 22, 2026",dur:63,avgPct:48.15,views:1058,watch:4.64,subs:0,imp:160,ctr:3.75},
+  {id:"IHBY8E1AoQ8",title:"Jadi UIN Pontianak? Kita Pasti Bisa #podcast #iainpontianak",date:"Jan 31, 2026",dur:72,avgPct:31.69,views:905,watch:3.48,subs:0,imp:256,ctr:3.13},
+  {id:"FOgXQIVBaNc",title:"IAIN ke UIN? Transformasi Menuju Kampus Unggul #shorts",date:"Jan 18, 2026",dur:38,avgPct:46.42,views:1008,watch:3.14,subs:0,imp:317,ctr:8.52},
+  {id:"Qpr-EFmcwJA",title:"Wajib Nonton! Cara Melayani Mahasiswa Tanpa Bikin 'Resah & Gelisah'",date:"Feb 1, 2026",dur:117,avgPct:22.74,views:813,watch:2.26,subs:0,imp:242,ctr:1.65},
+  {id:"b0mAE8thvkE",title:"Efisiensi lagi?! Bongkar Rahasia Perencanaan Anggaran IAIN Pontianak",date:"Apr 23, 2026",dur:2903,avgPct:4.74,views:56,watch:2.14,subs:1,imp:35,ctr:28.57},
+  {id:"c-C_nzv78Bw",title:"Kuliah di IAIN Pontianak Susah Kerja? #shorts #podcast",date:"Feb 8, 2026",dur:112,avgPct:69.99,views:348,watch:1.81,subs:1,imp:100,ctr:6},
+  {id:"lq0cmizHDEU",title:"Lampaui Batas: Nufus, Mahasiswa Difabel Capai Prestasi Tingkat Nasional",date:"Jan 20, 2026",dur:1845,avgPct:5.52,views:53,watch:1.5,subs:1,imp:691,ctr:3.04},
+  {id:"9VmvdtgFUX8",title:"Kabar Gembira! Mahasiswa dari Panti Asuhan Berpeluang Bebas UKT",date:"Feb 3, 2026",dur:65,avgPct:31.63,views:487,watch:1.2,subs:1,imp:266,ctr:3.01},
+  {id:"tho0d3WO8gU",title:"Jangan Cuma Jadi PNS! Rahasia Cepat Kerja Sejak Kuliah #shorts",date:"Feb 2, 2026",dur:110,avgPct:23.14,views:198,watch:0.67,subs:0,imp:249,ctr:1.61},
+  {id:"OMVDZNFfUyg",title:"Banyak Orang Sakit Saat Puasa, Ini Penyebabnya!",date:"Mar 19, 2026",dur:1558,avgPct:6.12,views:22,watch:0.58,subs:0,imp:299,ctr:6.35},
+  {id:"7J6RSeP9oyw",title:"Mengubah Realita Jadi Dunia Fantasi #shorts",date:"Apr 12, 2026",dur:74,avgPct:25.07,views:172,watch:0.47,subs:0,imp:144,ctr:5.56},
+  {id:"H6rUKcbtZQ0",title:"Nggak Punya Biaya Kuliah? Jangan Menyerah, Ada Beasiswa KIP! #shorts",date:"Feb 9, 2026",dur:85,avgPct:39.6,views:73,watch:0.39,subs:0,imp:159,ctr:5.66},
+  {id:"YnssQfQ7O4A",title:"Motivasi dan Resep Sukses Nufus: Sabar dan Ikhlas #shorts",date:"Jan 26, 2026",dur:101,avgPct:16.38,views:115,watch:0.21,subs:0,imp:165,ctr:1.82},
+  {id:"Bxy-5QLdf6w",title:"Kuliah di IAIN Pontianak, Dapat Skill Apa #shorts",date:"Feb 10, 2026",dur:113,avgPct:9.93,views:135,watch:0.15,subs:0,imp:198,ctr:4.04},
+  {id:"OqDXjWtBMVA",title:"Live Stream Barometer Kampus",date:"Apr 13, 2026",dur:0,avgPct:0,views:0,watch:0,subs:1,imp:0,ctr:0},
+  {id:"KUL0x5FPbng",title:"Gila! Jual HP Demi Damkar, Sekarang Malah Punya Rumah!",date:"Apr 29, 2026",dur:1800,avgPct:0,views:0,watch:0,subs:0,imp:0,ctr:0,status:"Siap",progress:85,guest:"Narasumber Damkar",schedule:"Apr 29, 2026",pic:"Barometer Kampus",note:"Siap tayang pada 29 April 2026"},
+];
+
+// Enrich
+VIDEOS.forEach(v=>{
+  if(!v.type) v.type = v.dur < 200 ? 'Shorts' : (v.dur >= 2400 ? 'Podcast' : 'YouTube');
+  if(!v.status) v.status = 'Terbit';
+  if(!v.progress){
+    const progressMap = {Ide:10, Rekaman:30, Editing:50, Review:70, Siap:85, Terbit:100};
+    v.progress = progressMap[v.status] || 0;
+  }
+});
+
+
+
+const UPCOMING_CONTENTS = [
+  {id:"KUL0x5FPbng",title:"Gila! Jual HP Demi Damkar, Sekarang Malah Punya Rumah!",type:"YouTube",status:"Siap",progress:85,guest:"Narasumber Damkar",schedule:"Apr 29, 2026",publishDate:"2026-04-29T09:00:00+07:00",pic:"Barometer Kampus",note:"Siap tayang pada 29 April 2026"}
+];
+
+// CONFIG
+const STATUS_CFG = {
+  Terbit:  {cls:'s-terbit',  dot:'sd-terbit',  fill:'pf-terbit',  label:'Terbit',   pct:100},
+  Siap:    {cls:'s-siap',    dot:'sd-siap',    fill:'pf-siap',    label:'Siap Upload', pct:85},
+  Review:  {cls:'s-review',  dot:'sd-review',  fill:'pf-review',  label:'Review',   pct:70},
+  Editing: {cls:'s-editing', dot:'sd-editing', fill:'pf-editing', label:'Editing',  pct:50},
+  Rekaman: {cls:'s-rekaman', dot:'sd-rekaman', fill:'pf-rekaman', label:'Rekaman',  pct:30},
+  Ide:     {cls:'s-ide',     dot:'sd-ide',     fill:'pf-ide',     label:'Ide',      pct:10},
+};
+const TYPE_CFG = {
+  Shorts: {cls:'b-shorts',  label:'Shorts'},
+  Podcast:{cls:'b-podcast', label:'Podcast'},
+  YouTube:{cls:'b-youtube', label:'YouTube'},
+};
+const CARD_CLS = {Terbit:'card-terbit',Siap:'card-siap',Review:'card-review',Editing:'card-editing',Rekaman:'card-rekaman',Ide:'card-ide'};
+
+// WORKFLOW STEPS
+const WF_STEPS = ['Ide','Rekaman','Editing','Review','Siap Upload','Terbit'];
+const WF_ICONS = ['💡','🎙️','✂️','🔍','☁️','🌟'];
+const statusAlias = s => s === 'Siap' ? 'Siap Upload' : s;
+const wfCount = {Ide:0,Rekaman:0,Editing:0,Review:0,'Siap Upload':0,Terbit:0};
+VIDEOS.forEach(v => wfCount[statusAlias(v.status)] = (wfCount[statusAlias(v.status)] || 0) + 1);
+let wfHtml = '';
+WF_STEPS.forEach((s,i)=>{
+  const cnt = wfCount[s]||0;
+  const isActive = cnt > 0;
+  const cls = s==='Terbit' ? 'terbit' : (isActive ? 'done' : 'inactive');
+  wfHtml += `<div class="wf-step"><div class="wf-dot ${cls}">${WF_ICONS[i]}</div><div class="wf-label ${cls}">${s}</div><div class="wf-count">${cnt} konten</div></div>`;
+  if(i<WF_STEPS.length-1) wfHtml += `<div class="wf-connector ${isActive?'done':'inactive'}"></div>`;
+});
+document.getElementById('wfTrack').innerHTML = wfHtml;
+
+// HEADER PILLS
+const publishedVideos = VIDEOS.filter(v=>v.status==='Terbit');
+const productionVideos = VIDEOS.filter(v=>v.status!=='Terbit');
+const totalViews = publishedVideos.reduce((a,v)=>a+v.views,0);
+const totalWatch = publishedVideos.reduce((a,v)=>a+v.watch,0);
+const totalSubs  = publishedVideos.reduce((a,v)=>a+v.subs,0);
+const avgCTR     = (publishedVideos.reduce((a,v)=>a+v.ctr,0)/Math.max(publishedVideos.length,1)).toFixed(2);
+document.getElementById('headerPills').innerHTML = `
+  <div class="pill"><span class="pill-val">${VIDEOS.length}</span><span class="pill-label">Total Konten</span></div>
+  <div class="pill"><span class="pill-val">${productionVideos.length}</span><span class="pill-label">Siap Tayang</span></div>
+  <div class="pill"><span class="pill-val">${publishedVideos.length}</span><span class="pill-label">Sudah Terbit</span></div>
+  <div class="pill"><span class="pill-val">${totalViews.toLocaleString()}</span><span class="pill-label">Total Views</span></div>
+  <div class="pill"><span class="pill-val">${Math.round(totalWatch)} jam</span><span class="pill-label">Watch Time</span></div>
+  <div class="pill"><span class="pill-val">${avgCTR}%</span><span class="pill-label">Avg CTR</span></div>`;
+
+// STATS CARDS
+document.getElementById('statsGrid').innerHTML = `
+  <div class="stat-card c1"><div class="stat-label">Sudah Terbit</div><div class="stat-val">${publishedVideos.length}</div><div class="stat-sub">konten tayang</div><div class="stat-icon">✅</div></div>
+  <div class="stat-card c2"><div class="stat-label">Siap Tayang</div><div class="stat-val">${productionVideos.length}</div><div class="stat-sub">jadwal 29 April 2026</div><div class="stat-icon">🎬</div></div>
+  <div class="stat-card c3"><div class="stat-label">Total Views</div><div class="stat-val">${totalViews.toLocaleString()}</div><div class="stat-sub">semua konten tayang</div><div class="stat-icon">👁️</div></div>
+  <div class="stat-card c4"><div class="stat-label">Watch Time</div><div class="stat-val">${Math.round(totalWatch)}</div><div class="stat-sub">jam ditonton</div><div class="stat-icon">⏱️</div></div>
+  <div class="stat-card c5"><div class="stat-label">Avg CTR</div><div class="stat-val">${avgCTR}%</div><div class="stat-sub">rata-rata semua video</div><div class="stat-icon">📊</div></div>
+  <div class="stat-card c6"><div class="stat-label">Subscriber Baru</div><div class="stat-val">+${totalSubs}</div><div class="stat-sub">dari seluruh konten</div><div class="stat-icon">🔔</div></div>`;
+
+// STATE
+const PER_PAGE = 15;
+let filtered = [...VIDEOS];
+let currentPage = 1;
+let activeFilter = 'semua';
+let searchQ = '';
+let sortKey = 'views';
+let viewMode = 'table';
+
+function applyFilters(){
+  filtered = VIDEOS.filter(v=>{
+    const ft = activeFilter==='semua'||v.type===activeFilter||(activeFilter==='Terbit'&&v.status==='Terbit')||(activeFilter==='Podcast'&&(v.type==='Podcast'||v.type==='YouTube'));
+    const fs = v.title.toLowerCase().includes(searchQ.toLowerCase());
+    return ft && fs;
+  });
+  filtered.sort((a,b)=>{
+    if(sortKey==='views')   return b.views-a.views;
+    if(sortKey==='watchtime')return b.watch-a.watch;
+    if(sortKey==='ctr')     return b.ctr-a.ctr;
+    if(sortKey==='avgview') return b.avgPct-a.avgPct;
+    if(sortKey==='date')    return new Date(b.date)-new Date(a.date);
+    return 0;
+  });
+  currentPage=1;
+  render();
+}
+
+function render(){
+  if(viewMode==='table') renderTable();
+  else renderCards();
+}
+
+function renderTable(){
+  const start=(currentPage-1)*PER_PAGE;
+  const page=filtered.slice(start,start+PER_PAGE);
+  const maxV=filtered.length?Math.max(...filtered.map(v=>v.views),1):1;
+  document.getElementById('countBadge').textContent=`${filtered.length} video`;
+  const ctrColor=c=>c>=7?'#10b981':c>=4?'#f59e0b':'#ef4444';
+  document.getElementById('tableBody').innerHTML=page.map((v,i)=>{
+    const sc=STATUS_CFG[v.status];
+    const tc=TYPE_CFG[v.type];
+    return `<tr onclick="window.open('https://youtu.be/${v.id}','_blank')">
+      <td style="color:var(--muted);font-size:11px">${start+i+1}</td>
+      <td style="max-width:240px">
+        <div style="font-weight:700;font-size:12px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${v.title}">${v.title}${perfTag(v)}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px">${v.id}</div>
+      </td>
+      <td><span class="badge ${tc.cls}">${tc.label}</span></td>
+      <td>
+        <span class="s-badge ${sc.cls}">
+          <span class="s-dot ${sc.dot}"></span>${sc.label}
+        </span>
+      </td>
+      <td class="prog-col">
+        <div class="prog-label">
+          <span class="prog-pct">${v.progress}%</span>
+          <span class="prog-stage">${sc.label}</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill ${sc.fill}" style="width:${v.progress}%"></div></div>
+      </td>
+      <td style="font-size:11px;color:var(--muted);white-space:nowrap">${v.date}</td>
+      <td>
+        <div style="font-weight:700;font-size:12px;color:var(--navy)">${v.views.toLocaleString()}</div>
+        <div class="views-bar-wrap"><div class="views-bar-fill" style="width:${Math.round(v.views/maxV*100)}%"></div></div>
+      </td>
+      <td style="font-weight:600;font-size:12px;color:var(--navy)">${v.watch.toFixed(1)}<span style="font-size:10px;color:var(--muted)"> jam</span></td>
+      <td>
+        <div style="font-weight:700;font-size:12px;color:var(--navy)">${v.avgPct.toFixed(1)}%</div>
+        <div class="prog-track" style="margin-top:4px"><div class="prog-fill pf-editing" style="width:${Math.min(100,Math.round(v.avgPct))}%"></div></div>
+      </td>
+      <td style="font-weight:700;font-size:12px;color:${ctrColor(v.ctr)}">${v.ctr.toFixed(1)}%</td>
+      <td><a style="color:var(--blue-light);font-size:10px;font-weight:700;text-decoration:none" href="https://youtu.be/${v.id}" target="_blank" onclick="event.stopPropagation()">▶ Tonton</a></td>
+    </tr>`;
+  }).join('');
+  renderPagination('pagination','tableView');
+}
+
+function renderCards(){
+  const start=(currentPage-1)*PER_PAGE;
+  const page=filtered.slice(start,start+PER_PAGE);
+  document.getElementById('cardGrid').innerHTML=page.map(v=>{
+    const sc=STATUS_CFG[v.status];
+    const tc=TYPE_CFG[v.type];
+    return `<div class="content-card ${CARD_CLS[v.status]}" onclick="window.open('https://youtu.be/${v.id}','_blank')">
+      <div class="card-top">
+        <div class="card-title" title="${v.title}">${v.title} ${perfTag(v)}</div>
+        <div class="card-type"><span class="badge ${tc.cls}">${tc.label}</span></div>
+      </div>
+      <div class="card-meta">
+        <span class="s-badge ${sc.cls}"><span class="s-dot ${sc.dot}"></span>${sc.label}</span>
+        <span class="card-date">${v.date}</span>
+      </div>
+      <div class="card-prog-label">
+        <span class="card-prog-pct">${v.progress}% selesai</span>
+        <span class="card-prog-status">${sc.label}</span>
+      </div>
+      <div class="card-prog-track"><div class="card-prog-fill ${sc.fill}" style="width:${v.progress}%"></div></div>
+      <div class="card-stats">
+        <div class="card-stat"><div class="card-stat-val">${v.views.toLocaleString()}</div><div class="card-stat-label">Views</div></div>
+        <div class="card-stat"><div class="card-stat-val">${v.watch.toFixed(1)}</div><div class="card-stat-label">Jam</div></div>
+        <div class="card-stat"><div class="card-stat-val">${v.ctr.toFixed(1)}%</div><div class="card-stat-label">CTR</div></div>
+      </div>
+    </div>`;
+  }).join('');
+  renderPagination('paginationCard','cardView');
+}
+
+function renderPagination(elId){
+  const total=Math.ceil(filtered.length/PER_PAGE);
+  const start=(currentPage-1)*PER_PAGE+1;
+  const end=Math.min(currentPage*PER_PAGE,filtered.length);
+  let btns='';
+  for(let i=1;i<=total;i++){
+    if(i===1||i===total||Math.abs(i-currentPage)<=1) btns+=`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+    else if(Math.abs(i-currentPage)===2) btns+=`<span style="padding:0 2px;color:var(--muted)">…</span>`;
+  }
+  document.getElementById(elId).innerHTML=`
+    <span>Menampilkan ${filtered.length?start:0}–${end} dari ${filtered.length} video</span>
+    <div class="page-btns">
+      <button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>
+      ${btns}
+      <button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total||!total?'disabled':''}>›</button>
+    </div>`;
+}
+
+function goPage(p){
+  const total=Math.ceil(filtered.length/PER_PAGE);
+  if(p<1||p>total)return;
+  currentPage=p;
+  render();
+  window.scrollTo({top:document.querySelector('.toolbar').offsetTop-16,behavior:'smooth'});
+}
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function doSearch(q){searchQ=q;applyFilters();}
+function doSort(k){sortKey=k;applyFilters();}
+function setView(v){
+  viewMode=v;
+  document.getElementById('tableView').style.display=v==='table'?'block':'none';
+  document.getElementById('cardView').style.display=v==='card'?'block':'none';
+  document.getElementById('btnTable').classList.toggle('active',v==='table');
+  document.getElementById('btnCard').classList.toggle('active',v==='card');
+  render();
+}
+
+
+function renderInsights(){
+  const topViews=[...VIDEOS].sort((a,b)=>b.views-a.views)[0];
+  const bestCtr=[...VIDEOS].filter(v=>v.imp>0).sort((a,b)=>b.ctr-a.ctr)[0];
+  const lowRetention=[...VIDEOS].filter(v=>v.dur>200).sort((a,b)=>a.avgPct-b.avgPct)[0];
+  document.getElementById('insightGrid').innerHTML=`
+    <div class="insight-card"><div class="insight-kicker">Top Views</div><div class="insight-main trend-up">${topViews.views.toLocaleString()}</div><div class="insight-note">${topViews.title}</div></div>
+    <div class="insight-card"><div class="insight-kicker">CTR Tertinggi</div><div class="insight-main trend-up">${bestCtr.ctr.toFixed(1)}%</div><div class="insight-note">Judul/thumbnail paling kuat untuk impresi.</div></div>
+    <div class="insight-card"><div class="insight-kicker">Perlu Retensi</div><div class="insight-main trend-warn">${lowRetention.avgPct.toFixed(1)}%</div><div class="insight-note">Evaluasi opening 15 detik: ${lowRetention.title}</div></div>`;
+}
+function getCountdownLabel(dateString){
+  const target = new Date(dateString || '2026-04-29T09:00:00+07:00');
+  const now = new Date();
+  const diff = target - now;
+  if(diff <= 0) return 'Jadwal tayang: 29 April 2026';
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  if(days > 0) return days + ' hari ' + hours + ' jam lagi';
+  return Math.max(hours,1) + ' jam lagi';
+}
+function renderPlans(){
+  const statusClass=s=>STATUS_CFG[s]?.cls||'s-ide';
+  document.getElementById('planCount').textContent=UPCOMING_CONTENTS.length + ' agenda';
+  if(!UPCOMING_CONTENTS.length){
+    document.getElementById('planList').innerHTML='<div class="schedule-empty">Belum ada jadwal narasumber dan produksi.</div>';
+    return;
+  }
+  document.getElementById('planList').innerHTML=UPCOMING_CONTENTS.map(v=>{
+    const parts=v.schedule.split(' ');
+    const linkAttr = v.id ? ' onclick="window.open(\'https://youtu.be/' + v.id + '\',\'_blank\')" style="cursor:pointer"' : '';
+    const linkText = v.id ? ' · <a href="https://youtu.be/' + v.id + '" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue-light);font-weight:800;text-decoration:none">▶ Link YouTube</a>' : '';
+    return '<div class="plan-card"' + linkAttr + '>' +
+      '<div class="plan-date">' + (parts[1]?.replace(',','')||'') + '<small>' + (parts[0]||'') + '</small></div>' +
+      '<div><div class="plan-title">' + v.title + '</div>' +
+      '<div class="plan-meta">🎙️ ' + v.guest + ' · ' + v.type + ' · PIC: ' + v.pic + linkText + '<br>' + v.note + '</div>' +
+      '<div class="countdown-box">⏳ <span>Countdown:</span> <strong>' + getCountdownLabel(v.publishDate) + '</strong></div></div>' +
+      '<span class="plan-status ' + statusClass(v.status) + '">🆕 ' + (STATUS_CFG[v.status]?.label||v.status) + '</span>' +
+    '</div>';
+  }).join('');
+}
+function perfTag(v){
+  if(v.views>=900) return '<span class="perf-tag tag-hot">🔥 Top</span>';
+  if(v.ctr>=7) return '<span class="perf-tag tag-good">⭐ CTR</span>';
+  if(v.avgPct<10 && v.dur>200) return '<span class="perf-tag tag-watch">⚠️ Retensi</span>';
+  return '';
+}
+renderInsights();
+renderPlans();
+
+applyFilters();
+</script>
+</body>
+</html>
