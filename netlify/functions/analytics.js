@@ -31,7 +31,7 @@ exports.handler = async function () {
     ids: "channel==MINE",
     startDate,
     endDate,
-    metrics: "views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,impressions,impressionClickThroughRate",
+    metrics: "views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage",
     dimensions: "video",
     sort: "-views",
     maxResults: "50"
